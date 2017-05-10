@@ -4,7 +4,7 @@
 #define BLOCK_SIDE 200
 #define SCROLL_AREA_HEIGHT BLOCK_SIDE + 10
 
-#define APPLICATION_PATH "../interface/"
+#define APPLICATION_PATH "../hand-face-nui/"
 #define CLASSIFIERS_PATH "classifiers/"
 #define SOUNDS_PATH "sounds/"
 
