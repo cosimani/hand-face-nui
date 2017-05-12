@@ -1,6 +1,8 @@
 #include "interface.hpp"
 #include "ui_interface.h"
 
+#include <QDebug>
+
 Interface::Interface( QWidget *parent ) : QWidget( parent ),
                                           ui( new Ui::Interface ),
                                           cameraWidget( new CameraWidget )
@@ -9,7 +11,6 @@ Interface::Interface( QWidget *parent ) : QWidget( parent ),
     this->setCamera( new Camera( this ) );
     this->setBlockSelectionTimer( new QTimer( this ) );
     this->setBlockSelection( false );
-    this->setSpeaker( new Speech( this ) );
 
     ui->setupUi( this );
     ui->scrollArea->setFixedHeight( SCROLL_AREA_HEIGHT );
@@ -32,12 +33,24 @@ Interface::Interface( QWidget *parent ) : QWidget( parent ),
              SIGNAL( timeout() ),
              SLOT( unblockSelection() ) );
 
-
     connect( camera, SIGNAL( signal_newCameraFrame(cv::Mat*) ),
              cameraWidget, SLOT( slot_setCameraTexture(cv::Mat*) ) );
 
     connect( camera, SIGNAL( signal_nonFaceDetected() ),
              this, SLOT( phraseReset() ) );
+
+    connect( camera, SIGNAL( signal_sonrisa() ),
+             this, SLOT( slot_volverMenuInicio() ) );
+
+    connect( this, SIGNAL( signal_opcionFinalElegida( int ) ),
+             this, SLOT( slot_controlarSlider( int ) ) );
+
+    connect( ui->pbMano, SIGNAL( clicked( bool ) ),
+             this, SLOT( slot_laManoEstaAbierta( bool ) ) );
+
+    connect( this->getCamera(), SIGNAL( signal_cursorTracking( QPoint ) ),
+             this, SLOT( slot_posicionFeature( QPoint ) ) );
+
 
 //    ui->cameraWidget->setVisible( false );
 
@@ -110,16 +123,6 @@ bool Interface::getBlockSelection() const
 void Interface::setBlockSelection( bool value )
 {
     blockSelection = value;
-}
-
-Speech *Interface::getSpeaker() const
-{
-    return speaker;
-}
-
-void Interface::setSpeaker( Speech *value )
-{
-    speaker = value;
 }
 
 bool Interface::initInterface( QFile *file )
@@ -226,9 +229,10 @@ void Interface::createAndSet( Node *node )
     }
 
     if( node->getChildren().size() == 1 &&
-        node->getChildren().at( 0 ) == "none" )
+        node->getChildren().at( 0 ) == "none" )  // Aca arma la frase, aca se deberia abrir el QSlider
     {
         //this->getSpeaker()->read( this->ui->sentenceLabel->text() );
+
         return;
     }
 
@@ -284,6 +288,9 @@ void Interface::clickBlock( int index )
         if( index >= 0 && index < blocksList.size() )
         {
             blocksList.at( index )->simulateClick();
+
+            emit signal_opcionFinalElegida( index );
+
         }
 
         this->setBlockSelection( true );
@@ -301,4 +308,67 @@ void Interface::phraseReset()
 {
     this->ui->sentenceLabel->clear();
     this->createAndSet( this->getGraph()->get( INITIAL_NODE_ID ) );
+
+    qDebug() << "phraseReset";
 }
+
+void Interface::slot_controlarSlider(int index)
+{
+    ui->slider->setEnabled( true );
+    ui->sentenceLabel->setText( QString::number( index ) );
+
+    this->getCamera()->setTipoDeteccion( Camera::OnlySmile );
+}
+
+void Interface::slot_volverMenuInicio()
+{
+    ui->slider->setEnabled( false );
+    ui->sentenceLabel->clear();
+    this->phraseReset();
+
+    this->getCamera()->setTipoDeteccion( Camera::HaarCascades );
+}
+
+/**
+ * @brief Interface::slot_laManoEstaAbierta Se invoca este slot cuando la deteccion de la mano cambia de estado.
+ * Cuando la mano se extiende, se invoca esta slot con true. Si la mano se cierra, invoca con false.
+ * @param abierta
+ */
+void Interface::slot_laManoEstaAbierta(bool abierta)
+{
+    if ( abierta == true && this->getCamera()->getTipoDeteccionActual() == Camera::Features )
+        this->getCamera()->setTipoDeteccion( Camera::OnlySmile );
+    else if ( abierta == false )  {
+        this->getCamera()->setIsNeedCalibrated( true );
+        this->getCamera()->setTipoDeteccion( Camera::Features );
+    }
+
+    abierta ? qDebug() << "Mano abierta" : qDebug() << "Mano cerrada";
+    abierta ? ui->lInfo->setText( "Mano abierta" ) :
+              ui->lInfo->setText( "Mano cerrada" );
+
+}
+
+void Interface::slot_posicionFeature( QPoint target )
+{
+    int minSlider = 0;
+    int maxSlider = 100;
+
+    int minMouse = 310;
+    int maxMouse = 345;
+
+    float relacion = float( maxSlider - minSlider ) / float( maxMouse - minMouse );
+
+    int valor_nuevo = float( target.x() - minMouse ) * relacion;
+
+    if ( valor_nuevo <= 0 )  valor_nuevo = 0;
+    if ( valor_nuevo >= 100 )  valor_nuevo = 100;
+
+    valor_nuevo = 100 - valor_nuevo;
+
+    ui->lPosicionX->setText( QString::number(target.x() ) );
+
+    ui->slider->setValue( valor_nuevo );
+}
+
+

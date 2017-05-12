@@ -16,7 +16,6 @@
 #include "interface/camerawidget.h"
 
 #include "common.hpp"
-#include "speech.hpp"
 
 namespace Ui
 {
@@ -39,8 +38,6 @@ private:
     void setStyle();
     void changeStyle();
 
-    Speech *speaker;
-
     CameraWidget * cameraWidget;
 
 public:
@@ -60,9 +57,6 @@ public:
     bool getBlockSelection() const;
     void setBlockSelection( bool value );
 
-    Speech *getSpeaker() const;
-    void setSpeaker( Speech *value );
-
     bool initInterface( QFile *file );
 
 protected:
@@ -77,6 +71,21 @@ private slots:
     void clickBlock( int index );
     void unblockSelection();
     void phraseReset();
+
+    void slot_controlarSlider( int index );
+    void slot_volverMenuInicio();
+    void slot_laManoEstaAbierta( bool abierta );
+    void slot_posicionFeature( QPoint target );
+
+signals:
+    /**
+     * @brief signal_opcionFinalElegida Envia la posicion del boton en donde se hace clic. Esta pensado para
+     * que el menu de opciones no sea anidado con mas opciones dentro de los botones. Hay que tener relacionado el index
+     * que corresponde a cual opcion.
+     * @param index
+     */
+    void signal_opcionFinalElegida( int index );
+
 };
 
 #endif // INTERFACE_HPP

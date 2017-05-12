@@ -24,6 +24,40 @@ class Camera : public QObject
 {
     Q_OBJECT
 
+public:
+
+    enum TipoDeteccion { HaarCascades, Features, OnlySmile };
+
+    explicit Camera( QObject *parent = NULL );
+
+    VideoCapture *getVideoCapture() const;
+    void setVideoCapture( VideoCapture *value );
+
+    QTimer *getSceneTimer() const;
+    void setSceneTimer( QTimer *value );
+
+    Mat *getCameraTexture() const;
+    void setCameraTexture( Mat *value );
+
+    CascadeClassifier *getFrontalFaceClassifier() const;
+    void setFrontalFaceClassifier( CascadeClassifier *value);
+
+    CascadeClassifier *getSmileClassifier() const;
+    void setSmileClassifier( CascadeClassifier *value);
+
+    int getSize() const;
+    void setSize( int value );
+
+    bool getSmiling() const;
+    void setSmiling( bool value );
+
+    void setTipoDeteccion( TipoDeteccion tipo );
+
+    TipoDeteccion getTipoDeteccionActual() const;
+
+    bool getIsNeedCalibrated() const;
+    void setIsNeedCalibrated(bool value);
+
 private:
 
     VideoCapture *videoCapture;
@@ -55,30 +89,10 @@ private:
      */
     int countFrameFaceless;
 
-public:
+    TipoDeteccion tipoDeteccionActual;
 
-    explicit Camera( QObject *parent = NULL );
+    bool isNeedCalibrated;
 
-    VideoCapture *getVideoCapture() const;
-    void setVideoCapture( VideoCapture *value );
-
-    QTimer *getSceneTimer() const;
-    void setSceneTimer( QTimer *value );
-
-    Mat *getCameraTexture() const;
-    void setCameraTexture( Mat *value );
-
-    CascadeClassifier *getFrontalFaceClassifier() const;
-    void setFrontalFaceClassifier( CascadeClassifier *value);
-
-    CascadeClassifier *getSmileClassifier() const;
-    void setSmileClassifier( CascadeClassifier *value);
-
-    int getSize() const;
-    void setSize( int value );
-
-    bool getSmiling() const;
-    void setSmiling( bool value );
 
 private slots:
 
@@ -105,6 +119,18 @@ signals:
      * FRAMES_FACELESS_BACK frames. Es para volver atras en la frase que se esta armando.
      */
     void signal_nonFaceDetectedForBack();
+
+    /**
+     * @brief signal_sonrisa Se emite para indica que la sonrisa fue detectada. Requiere OnlySmile activo.
+     */
+    void signal_sonrisa();
+
+
+    /**
+     * @brief signal_cursorTracking Se emite cuando se detecta con Features. Envia la posicion donde
+     * deberia quedar el mouse, en caso de desear controlarlo.
+     */
+    void signal_cursorTracking( QPoint );
 };
 
 #endif // CAMERA_HPP

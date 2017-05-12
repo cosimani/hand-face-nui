@@ -13,7 +13,7 @@ unix:LIBS += -lopencv_core \
              -lopencv_objdetect \
 #             -lopencv_calib3d \
 #             -lopencv_ml \
-#             -lopencv_video \
+             -lopencv_video \
 #             -lopencv_features2d \
 #             -lopencv_flann \
 #             -lopencv_photo \
@@ -24,8 +24,6 @@ unix:LIBS += -lopencv_core \
 #             -lopencv_imgcodecs \
              -lopencv_videoio \
 #             -lopencv_bgsegm
-
-LIBS += "$$DIR_OTHER_LIBS/libespeak.so"
 
 SOURCES += \
     main.cpp \
@@ -39,7 +37,9 @@ SOURCES += \
     processor/camera.cpp \
     theme/colorizer.cpp \
     theme/theme.cpp \
-    speech.cpp
+    pointmapper.cpp \
+    featuresprocessor.cpp \
+    gesturerecognizer.cpp
 
 HEADERS += \
     graph/graph.hpp \
@@ -54,9 +54,16 @@ HEADERS += \
     theme/colorizer.hpp \
     theme/theme.hpp \
     common.hpp \
-    speech.hpp
+    pointmapper.hpp \
+    featuresprocessor.hpp \
+    gesturerecognizer.hpp
 
 FORMS += \
     interface/block.ui \
     interface/interface.ui
+
+DISTFILES += \
+    classifiers/face.xml \
+    classifiers/smile.xml \
+    sounds/selected.wav
 

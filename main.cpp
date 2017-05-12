@@ -1,5 +1,6 @@
 #include <QApplication>
 #include <QFile>
+#include <QDesktopWidget>
 
 #include "interface/interface.hpp"
 #include "common.hpp"
@@ -11,12 +12,16 @@ int main( int argc, char **argv )
 
     QString xml( DATA_PATH );
     xml.append( XML_PATH );
-    xml.append( "ottaa.xml" );
+    xml.append( "nui.xml" );
     QFile file( xml );
 
     Interface *interface = new Interface();
-    interface->showMaximized();
-//    interface->show();
+//    interface->showMaximized();
+    interface->show();
+    interface->resize(QApplication::desktop()->screenGeometry().width(),
+                      QApplication::desktop()->screenGeometry().height()/2);
+    interface->move(0,0);
+
     interface->initInterface( &file );
 
     return app.exec();
