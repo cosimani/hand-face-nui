@@ -52,6 +52,18 @@ Interface::Interface( QWidget *parent ) : QWidget( parent ),
              this, SLOT( slot_posicionFeature( QPoint ) ) );
 
 
+    /// Configuracion de los sliders
+
+    ui->slider1->setEnabled( false );
+    ui->slider2->setEnabled( false );
+    ui->slider3->setEnabled( false );
+    ui->slider4->setEnabled( false );
+
+    ui->slider1->setTexto( "Luz roja" );
+    ui->slider2->setTexto( "Luz ambiente" );
+    ui->slider3->setTexto( "Luz de entrada" );
+    ui->slider4->setTexto( "Luz azul" );
+
 //    ui->cameraWidget->setVisible( false );
 
 }
@@ -314,15 +326,36 @@ void Interface::phraseReset()
 
 void Interface::slot_controlarSlider(int index)
 {
-    ui->slider->setEnabled( true );
-    ui->sentenceLabel->setText( QString::number( index ) );
+    switch( index )  {
+    case 0:
+        ui->slider1->setEnabled( true );
+        ui->sentenceLabel->setText( "Luz roja" );
+        break;
+    case 1:
+        ui->slider2->setEnabled( true );
+        ui->sentenceLabel->setText( "Luz ambiente" );
+        break;
+    case 2:
+        ui->slider3->setEnabled( true );
+        ui->sentenceLabel->setText( "Luz de entrada" );
+        break;
+    case 3:
+        ui->slider4->setEnabled( true );
+        ui->sentenceLabel->setText( "Luz azul" );
+        break;
+    default:;
+    }
 
     this->getCamera()->setTipoDeteccion( Camera::OnlySmile );
 }
 
 void Interface::slot_volverMenuInicio()
 {
-    ui->slider->setEnabled( false );
+    ui->slider1->setEnabled( false );
+    ui->slider2->setEnabled( false );
+    ui->slider3->setEnabled( false );
+    ui->slider4->setEnabled( false );
+
     ui->sentenceLabel->clear();
     this->phraseReset();
 
@@ -344,8 +377,6 @@ void Interface::slot_laManoEstaAbierta(bool abierta)
     }
 
     abierta ? qDebug() << "Mano abierta" : qDebug() << "Mano cerrada";
-    abierta ? ui->lInfo->setText( "Mano abierta" ) :
-              ui->lInfo->setText( "Mano cerrada" );
 
 }
 
@@ -366,9 +397,21 @@ void Interface::slot_posicionFeature( QPoint target )
 
     valor_nuevo = 100 - valor_nuevo;
 
-    ui->lPosicionX->setText( QString::number(target.x() ) );
+    qDebug() << QString::number(target.x() );
 
-    ui->slider->setValue( valor_nuevo );
+    if ( ui->slider1->isEnabled() )
+        ui->slider1->setValorActual( valor_nuevo );
+
+    if ( ui->slider2->isEnabled() )
+        ui->slider2->setValorActual( valor_nuevo );
+
+    if ( ui->slider3->isEnabled() )
+        ui->slider3->setValorActual( valor_nuevo );
+
+    if ( ui->slider4->isEnabled() )
+        ui->slider4->setValorActual( valor_nuevo );
+
+
 }
 
 

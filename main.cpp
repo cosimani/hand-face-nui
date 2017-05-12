@@ -16,11 +16,11 @@ int main( int argc, char **argv )
     QFile file( xml );
 
     Interface *interface = new Interface();
-//    interface->showMaximized();
-    interface->show();
-    interface->resize(QApplication::desktop()->screenGeometry().width(),
-                      QApplication::desktop()->screenGeometry().height()/2);
-    interface->move(0,0);
+    interface->showMaximized();
+//    interface->show();
+//    interface->resize(QApplication::desktop()->screenGeometry().width(),
+//                      QApplication::desktop()->screenGeometry().height()/2);
+//    interface->move(0,0);
 
     interface->initInterface( &file );
 

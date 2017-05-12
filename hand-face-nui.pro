@@ -39,7 +39,8 @@ SOURCES += \
     theme/theme.cpp \
     pointmapper.cpp \
     featuresprocessor.cpp \
-    gesturerecognizer.cpp
+    gesturerecognizer.cpp \
+    slider.cpp
 
 HEADERS += \
     graph/graph.hpp \
@@ -56,11 +57,13 @@ HEADERS += \
     common.hpp \
     pointmapper.hpp \
     featuresprocessor.hpp \
-    gesturerecognizer.hpp
+    gesturerecognizer.hpp \
+    slider.h
 
 FORMS += \
     interface/block.ui \
-    interface/interface.ui
+    interface/interface.ui \
+    slider.ui
 
 DISTFILES += \
     classifiers/face.xml \
