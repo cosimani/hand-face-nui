@@ -13,7 +13,7 @@
   <property name="font">
    <font>
     <family>Segoe UI Light</family>
-    <pointsize>24</pointsize>
+    <pointsize>9</pointsize>
    </font>
   </property>
   <property name="windowTitle">

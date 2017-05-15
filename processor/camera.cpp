@@ -10,7 +10,8 @@ Camera::Camera( QObject *parent ) : QObject( parent ),
                                     isCalibrated( false ),
                                     countFrameFaceless( 0 ),
                                     tipoDeteccionActual( HaarCascades ),
-                                    isNeedCalibrated( false )
+                                    isNeedCalibrated( false ),
+                                    handDetector( new HandDetection )
 {
     this->setVideoCapture( new VideoCapture( 0 ) );
     this->setSceneTimer( new QTimer( this ) );
@@ -283,63 +284,128 @@ void Camera::process()
 
     if ( tipoDeteccionActual == Features )  {
 
-            vector< Rect > faces;
-            faces.clear();
+        vector< Rect > faces;
+        faces.clear();
 
-            frontalFaceClassifier->detectMultiScale( *this->getCameraTexture(), faces,
-                                                     1.1, 2, 0 | CASCADE_SCALE_IMAGE, Size( 150, 150 ) );
+        frontalFaceClassifier->detectMultiScale( *this->getCameraTexture(), faces,
+                                                 1.1, 2, 0 | CASCADE_SCALE_IMAGE, Size( 150, 150 ) );
 
-            Rect roi( 0, 0, 0, 0 );
+        Rect roi( 0, 0, 0, 0 );
 
-            if( faces.size() > 0 )
-            {
-                roi = faces.at( 0 );
+        if( faces.size() > 0 )
+        {
+            roi = faces.at( 0 );
 
-                // actually noise tip region
+            // actually noise tip region
 
-                roi.x = roi.x + roi.width / ( double )3;
-                roi.y = roi.y + roi.height / ( double )2;
-                roi.width = roi.width * 1 / ( double )3;
-                roi.height = roi.height * 1 / ( double )3;
-            }
+            roi.x = roi.x + roi.width / ( double )3;
+            roi.y = roi.y + roi.height / ( double )2;
+            roi.width = roi.width * 1 / ( double )3;
+            roi.height = roi.height * 1 / ( double )3;
+        }
 
-            // Esta es la region de la nariz
-            QRect rectRoi( roi.x, roi.y, roi.width, roi.height );
+        // Esta es la region de la nariz
+        QRect rectRoi( roi.x, roi.y, roi.width, roi.height );
 
 
-            if( this->isNeedCalibrated )
-            {
-                // Este containerRect es 0,0 640x480
-                PointMapper::getInstance()->setContainerRect( QRect( 0, 0,
-                          this->getVideoCapture()->get( CV_CAP_PROP_FRAME_WIDTH ),
-                          this->getVideoCapture()->get( CV_CAP_PROP_FRAME_HEIGHT ) ) );
+        if( this->isNeedCalibrated )
+        {
+            // Este containerRect es 0,0 640x480
+            PointMapper::getInstance()->setContainerRect( QRect( 0, 0,
+                      this->getVideoCapture()->get( CV_CAP_PROP_FRAME_WIDTH ),
+                      this->getVideoCapture()->get( CV_CAP_PROP_FRAME_HEIGHT ) ) );
 
-                // Este es el rectangulo de la nariz
-                PointMapper::getInstance()->setOriginRect( rectRoi );
+            // Este es el rectangulo de la nariz
+            PointMapper::getInstance()->setOriginRect( rectRoi );
 
-                // Este es el rectangulo de la pantalla completa. Por ejemplo QRect(0,0 1366x768)
-                PointMapper::getInstance()->setTargetRect( QApplication::desktop()->screenGeometry() );
+            // Este es el rectangulo de la pantalla completa. Por ejemplo QRect(0,0 1366x768)
+            PointMapper::getInstance()->setTargetRect( QApplication::desktop()->screenGeometry() );
 //                PointMapper::getInstance()->setTargetRect( QRect(0,0, 100, 1) );
 
-                FeaturesProcessor::getInstance()->setNeedToInitFT( true );
-                FeaturesProcessor::getInstance()->setInitialFrames( true );
-                FeaturesProcessor::getInstance()->setInitialFramesCounter( 0 );
-                FeaturesProcessor::getInstance()->setFirstCentroid( true );
-                FeaturesProcessor::getInstance()->setDrawProcessing( false );  // Para que no imprima mensajes OSD
+            FeaturesProcessor::getInstance()->setNeedToInitFT( true );
+            FeaturesProcessor::getInstance()->setInitialFrames( true );
+            FeaturesProcessor::getInstance()->setInitialFramesCounter( 0 );
+            FeaturesProcessor::getInstance()->setFirstCentroid( true );
+            FeaturesProcessor::getInstance()->setDrawProcessing( false );  // Para que no imprima mensajes OSD
 
-                this->isNeedCalibrated = false;
-            }
+            this->isNeedCalibrated = false;
+        }
 
-            QPoint target = FeaturesProcessor::getInstance()->process( this->getCameraTexture(), rectRoi );
+        QPoint target = FeaturesProcessor::getInstance()->process( this->getCameraTexture(), rectRoi );
 
-            bool deseaControlarMouse = false;
+        bool deseaControlarMouse = false;
 
-            if( deseaControlarMouse )
-            {
-                QCursor::setPos( PointMapper::getInstance()->map( target ) );
-            }
+        if( deseaControlarMouse )
+        {
+            QCursor::setPos( PointMapper::getInstance()->map( target ) );
+        }
 
-            emit signal_cursorTracking( target );
+        emit signal_cursorTracking( target );
+    }
+
+    if ( tipoDeteccionActual == Features_and_hand )  {
+
+//        handDetector->fistDetection( *this->getCameraTexture(), refSkin->minimumHue, refSkin->maximumHue);
+
+
+
+        vector< Rect > faces;
+        faces.clear();
+
+        frontalFaceClassifier->detectMultiScale( *this->getCameraTexture(), faces,
+                                                 1.1, 2, 0 | CASCADE_SCALE_IMAGE, Size( 150, 150 ) );
+
+        Rect roi( 0, 0, 0, 0 );
+
+        if( faces.size() > 0 )
+        {
+            roi = faces.at( 0 );
+
+            // actually noise tip region
+
+            roi.x = roi.x + roi.width / ( double )3;
+            roi.y = roi.y + roi.height / ( double )2;
+            roi.width = roi.width * 1 / ( double )3;
+            roi.height = roi.height * 1 / ( double )3;
+        }
+
+        // Esta es la region de la nariz
+        QRect rectRoi( roi.x, roi.y, roi.width, roi.height );
+
+
+        if( this->isNeedCalibrated )
+        {
+            // Este containerRect es 0,0 640x480
+            PointMapper::getInstance()->setContainerRect( QRect( 0, 0,
+                      this->getVideoCapture()->get( CV_CAP_PROP_FRAME_WIDTH ),
+                      this->getVideoCapture()->get( CV_CAP_PROP_FRAME_HEIGHT ) ) );
+
+            // Este es el rectangulo de la nariz
+            PointMapper::getInstance()->setOriginRect( rectRoi );
+
+            // Este es el rectangulo de la pantalla completa. Por ejemplo QRect(0,0 1366x768)
+            PointMapper::getInstance()->setTargetRect( QApplication::desktop()->screenGeometry() );
+//                PointMapper::getInstance()->setTargetRect( QRect(0,0, 100, 1) );
+
+            FeaturesProcessor::getInstance()->setNeedToInitFT( true );
+            FeaturesProcessor::getInstance()->setInitialFrames( true );
+            FeaturesProcessor::getInstance()->setInitialFramesCounter( 0 );
+            FeaturesProcessor::getInstance()->setFirstCentroid( true );
+            FeaturesProcessor::getInstance()->setDrawProcessing( false );  // Para que no imprima mensajes OSD
+
+            this->isNeedCalibrated = false;
+        }
+
+        QPoint target = FeaturesProcessor::getInstance()->process( this->getCameraTexture(), rectRoi );
+
+        bool deseaControlarMouse = false;
+
+        if( deseaControlarMouse )
+        {
+            QCursor::setPos( PointMapper::getInstance()->map( target ) );
+        }
+
+        emit signal_cursorTracking( target );
     }
 }
 

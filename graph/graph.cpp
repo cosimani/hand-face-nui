@@ -2,7 +2,7 @@
 
 Graph::Graph( QObject *parent ) :
     QObject( parent ),
-    nodes( new QVector< Node* >() )
+    nodes( new QVector< Nodo* >() )
 {
 
 }
@@ -19,12 +19,12 @@ Graph::~Graph()
     delete this->getNodes();
 }
 
-QVector< Node* > *Graph::getNodes() const
+QVector< Nodo* > *Graph::getNodes() const
 {
     return nodes;
 }
 
-void Graph::setNodes( QVector< Node* > *value )
+void Graph::setNodes( QVector< Nodo* > *value )
 {
     nodes = value;
 }
@@ -45,7 +45,7 @@ bool Graph::initGraph( QFile *file )
     return true;
 }
 
-Node *Graph::get( QString id )
+Nodo *Graph::get( QString id )
 {
     for( int i = 0; i < this->getNodes()->size(); i++ )
     {

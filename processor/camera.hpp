@@ -13,6 +13,7 @@
 #include "common.hpp"
 
 #include "interface/camerawidget.h"
+#include "handdetection.h"
 
 #define FRAMES_FACELESS 70
 #define FRAMES_FACELESS_BACK 50
@@ -26,7 +27,7 @@ class Camera : public QObject
 
 public:
 
-    enum TipoDeteccion { HaarCascades, Features, OnlySmile };
+    enum TipoDeteccion { HaarCascades, Features, OnlySmile, Features_and_hand };
 
     explicit Camera( QObject *parent = NULL );
 
@@ -92,6 +93,8 @@ private:
     TipoDeteccion tipoDeteccionActual;
 
     bool isNeedCalibrated;
+
+    HandDetection * handDetector;
 
 
 private slots:

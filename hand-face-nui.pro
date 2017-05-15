@@ -28,7 +28,6 @@ unix:LIBS += -lopencv_core \
 SOURCES += \
     main.cpp \
     graph/graph.cpp \
-    graph/node.cpp \
     graph/xmlreader.cpp \
     interface/block.cpp \
     interface/camerawidget.cpp \
@@ -40,11 +39,12 @@ SOURCES += \
     pointmapper.cpp \
     featuresprocessor.cpp \
     gesturerecognizer.cpp \
-    slider.cpp
+    slider.cpp \
+    handdetection.cpp \
+    graph/nodo.cpp
 
 HEADERS += \
     graph/graph.hpp \
-    graph/node.hpp \
     graph/xmlreader.hpp \
     interface/block.hpp \
     interface/camerawidget.h \
@@ -58,7 +58,11 @@ HEADERS += \
     pointmapper.hpp \
     featuresprocessor.hpp \
     gesturerecognizer.hpp \
-    slider.h
+    slider.h \
+    handdetection.h \
+    skinfilter.h \
+    skin.h \
+    graph/nodo.hpp
 
 FORMS += \
     interface/block.ui \
@@ -68,5 +72,10 @@ FORMS += \
 DISTFILES += \
     classifiers/face.xml \
     classifiers/smile.xml \
-    sounds/selected.wav
+    sounds/selected.wav \
+    data/xml/nui.xml \
+    data/icons/luz_ambiente.png \
+    data/icons/luz_azul.png \
+    data/icons/luz_entrada.png \
+    data/icons/luz_roja.png
 

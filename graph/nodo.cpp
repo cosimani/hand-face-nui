@@ -1,6 +1,6 @@
-#include "node.hpp"
+#include "nodo.hpp"
 
-void Node::init( QString id,
+void Nodo::init( QString id,
                  QString title,
                  QString icon,
                  QStringList children,
@@ -13,7 +13,7 @@ void Node::init( QString id,
     this->setText( text );
 }
 
-Node::Node( QString id,
+Nodo::Nodo( QString id,
             QString title,
             QString icon,
             QStringList children,
@@ -24,57 +24,57 @@ Node::Node( QString id,
     this->init( id, title, icon, children, text );
 }
 
-Node::~Node()
+Nodo::~Nodo()
 {
 
 }
 
-QString Node::getId() const
+QString Nodo::getId() const
 {
     return id;
 }
 
-void Node::setId( const QString &value )
+void Nodo::setId( const QString &value )
 {
     id = value;
 }
 
-QString Node::getTitle() const
+QString Nodo::getTitle() const
 {
     return title;
 }
 
-void Node::setTitle( const QString &value )
+void Nodo::setTitle( const QString &value )
 {
     title = value;
 }
 
-QString Node::getIcon() const
+QString Nodo::getIcon() const
 {
     return icon;
 }
 
-void Node::setIcon(const QString &value )
+void Nodo::setIcon(const QString &value )
 {
     icon = value;
 }
 
-QStringList Node::getChildren() const
+QStringList Nodo::getChildren() const
 {
     return children;
 }
 
-void Node::setChildren( const QStringList &value )
+void Nodo::setChildren( const QStringList &value )
 {
     children = value;
 }
 
-QString Node::getText() const
+QString Nodo::getText() const
 {
     return text;
 }
 
-void Node::setText( const QString &value )
+void Nodo::setText( const QString &value )
 {
     text = value;
 }

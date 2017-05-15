@@ -66,7 +66,7 @@ protected:
 
 private slots:
 
-    void createAndSet( Node *node );
+    void createAndSet( Nodo *node );
     void activateBlock( int index );
     void clickBlock( int index );
     void unblockSelection();

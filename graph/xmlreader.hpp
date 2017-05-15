@@ -15,7 +15,7 @@
 #include <QXmlStreamReader>
 #include <QVector>
 
-#include "node.hpp"
+#include "nodo.hpp"
 
 class XMLReader : public QObject
 {
@@ -28,7 +28,7 @@ public:
     explicit XMLReader( QObject *parent = NULL );
     ~XMLReader();
 
-    QVector< Node* > *parseXML( QFile *file );
+    QVector< Nodo* > *parseXML( QFile *file );
 };
 
 #endif // XMLREADER_HPP

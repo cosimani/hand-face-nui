@@ -12,6 +12,8 @@ Slider::Slider(QWidget *parent) : QWidget(parent),
     this->setRango( 0, 100 );
     ui->label->setText( "" );
 
+    ui->label->setFixedWidth( this->width() / 2 );
+
     this->setWindowOpacity( 0.75 );
 
     connect(ui->qslider, SIGNAL( valueChanged( int ) ), ui->dial, SLOT( setValue( int ) ) );
@@ -44,7 +46,7 @@ void Slider::setTexto(QString texto)
     ui->label->setText( texto );
 }
 
-void Slider::paintEvent(QPaintEvent *event)
+void Slider::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
 

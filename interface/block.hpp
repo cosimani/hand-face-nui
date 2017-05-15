@@ -5,11 +5,10 @@
 #include <QPalette>
 #include <QEvent>
 
-#include "graph/node.hpp"
+#include "graph/nodo.hpp"
 #include "theme/colorizer.hpp"
 
 #include "image.hpp"
-
 #include "common.hpp"
 
 namespace Ui
@@ -26,11 +25,11 @@ private:
     Ui::Block *ui;
     bool active;
 
-    Node *associatedNode;
+    Nodo *associatedNode;
 
 public:
 
-    explicit Block( Node *associatedNode, QWidget *parent = NULL );
+    explicit Block( Nodo *associatedNode, QWidget *parent = NULL );
     ~Block();
 
     bool getActive() const;
@@ -38,8 +37,8 @@ public:
 
     void setStyle( bool active );
 
-    Node *getAssociatedNode() const;
-    void setAssociatedNode( Node *value );
+    Nodo *getAssociatedNode() const;
+    void setAssociatedNode( Nodo *value );
 
     void simulateClick();
 
@@ -50,7 +49,7 @@ protected:
 
 signals:
 
-    void clicked( Node* );
+    void clicked( Nodo* );
 };
 
 #endif // BLOCK_HPP

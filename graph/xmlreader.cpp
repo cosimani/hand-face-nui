@@ -11,7 +11,7 @@ XMLReader::~XMLReader()
 
 }
 
-QVector< Node* > *XMLReader::parseXML( QFile *file )
+QVector< Nodo* > *XMLReader::parseXML( QFile *file )
 {
     if( !file->open( QFile::ReadOnly | QFile::Text ) )
     {
@@ -20,7 +20,7 @@ QVector< Node* > *XMLReader::parseXML( QFile *file )
         return NULL;
     }
 
-    QVector< Node* > *nodes = new QVector< Node* >();
+    QVector< Nodo* > *nodes = new QVector< Nodo* >();
 
     QXmlStreamReader xmlReader;
     xmlReader.setDevice( file );
@@ -63,7 +63,7 @@ QVector< Node* > *XMLReader::parseXML( QFile *file )
                     icon     != "" &&
                     children != "" )
                 {
-                    nodes->append( new Node( id, title, icon, children.remove( " " ).split( "," ), text ) );
+                    nodes->append( new Nodo( id, title, icon, children.remove( " " ).split( "," ), text ) );
                 }
             }
         }

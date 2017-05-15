@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<nodes>
+
+	<node>
+		<id>inicio</id>
+		<title>Inicio</title>
+		<icon>inicio.png</icon>
+		<children>_luz1, _luz2, _luz3, _luz4, _luz5, _luz6</children>
+	</node>
+
+	<node>
+		<id>_luz1</id>
+		<title>Luz roja</title>
+		<icon>luz_roja.png</icon>
+		<children>none</children>
+	</node>
+	
+	<node>
+		<id>_luz2</id>
+		<title>Luz ambiente</title>
+		<icon>luz_ambiente.png</icon>
+		<children>none</children>
+	</node>
+
+	<node>
+		<id>_luz3</id>
+		<title>Luz entrada</title>
+		<icon>luz_entrada.png</icon>
+		<children>none</children>
+	</node>
+
+	<node>
+		<id>_luz4</id>
+		<title>Luz azul</title>
+		<icon>luz_azul.png</icon>
+		<children>none</children>
+	</node>
+
+</nodes>

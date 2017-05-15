@@ -26,7 +26,7 @@ private:
     Ui::Slider *ui;
 
 protected:
-    void paintEvent(QPaintEvent *event);
+    void paintEvent(QPaintEvent *);
 
 };
 

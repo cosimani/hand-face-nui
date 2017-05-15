@@ -5,7 +5,7 @@
 #include <QString>
 #include <QStringList>
 
-class Node : public QObject
+class Nodo : public QObject
 {
     Q_OBJECT
 
@@ -25,13 +25,13 @@ private:
 
 public:
 
-    explicit Node( QString id       = "",
+    explicit Nodo( QString id       = "",
                    QString title    = "",
                    QString icon     = "",
                    QStringList children = QStringList(),
                    QString text     = "",
                    QObject *parent  = NULL );
-    ~Node();
+    ~Nodo();
 
     QString getId() const;
     void setId( const QString &value );

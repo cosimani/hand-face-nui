@@ -5,7 +5,7 @@
 #include <QVector>
 #include <QFile>
 
-#include "node.hpp"
+#include "nodo.hpp"
 #include "xmlreader.hpp"
 
 class Graph : public QObject
@@ -14,18 +14,18 @@ class Graph : public QObject
 
 private:
 
-    QVector< Node* > *nodes;
+    QVector< Nodo* > *nodes;
 
 public:
 
     explicit Graph( QObject *parent = NULL );
     ~Graph();
 
-    QVector< Node* > *getNodes() const;
-    void setNodes( QVector< Node* > *value);
+    QVector< Nodo* > *getNodes() const;
+    void setNodes( QVector< Nodo* > *value);
 
     bool initGraph( QFile *file );
-    Node *get( QString id );
+    Nodo *get( QString id );
 };
 
 #endif // GRAPH_HPP

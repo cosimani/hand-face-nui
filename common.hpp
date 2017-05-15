@@ -8,7 +8,7 @@
 #define CLASSIFIERS_PATH "classifiers/"
 #define SOUNDS_PATH "sounds/"
 
-#define DATA_PATH "../../data/"
+#define DATA_PATH "../hand-face-nui/data/"
 #define ICONS_PATH "icons/"
 #define XML_PATH "xml/"
 

@@ -146,7 +146,7 @@ bool Interface::initInterface( QFile *file )
         return false;
     }
 
-    Node *initialNode = this->getGraph()->get( INITIAL_NODE_ID );
+    Nodo *initialNode = this->getGraph()->get( INITIAL_NODE_ID );
 
     if( !initialNode )
     {
@@ -225,7 +225,7 @@ void Interface::resizeEvent(QResizeEvent *e)
 //    cameraWidget->show();
 }
 
-void Interface::createAndSet( Node *node )
+void Interface::createAndSet( Nodo *node )
 {
     QList< Block* > blocksList = this->findChildren< Block* >();
     qDeleteAll( blocksList );
@@ -250,13 +250,13 @@ void Interface::createAndSet( Node *node )
 
     for( int i = 0; i < node->getChildren().size(); i++ )
     {
-        Node *newNode = this->getGraph()->get( node->getChildren().at( i ) );
+        Nodo *newNode = this->getGraph()->get( node->getChildren().at( i ) );
 
         if( newNode )
         {
             Block *block = new Block( newNode, this );
             this->ui->blocksLayout->addWidget( block );
-            connect( block, SIGNAL( clicked( Node* ) ), SLOT( createAndSet( Node* ) ) );
+            connect( block, SIGNAL( clicked( Nodo* ) ), SLOT( createAndSet( Nodo* ) ) );
         }
     }
 

@@ -1,7 +1,7 @@
 #include "block.hpp"
 #include "ui_block.h"
 
-Block::Block( Node *associatedNode, QWidget *parent ) :
+Block::Block( Nodo *associatedNode, QWidget *parent ) :
     QWidget( parent ),
     ui( new Ui::Block ),
     associatedNode( associatedNode )
@@ -44,12 +44,12 @@ void Block::setActive( bool value )
     active = value;
 }
 
-Node *Block::getAssociatedNode() const
+Nodo *Block::getAssociatedNode() const
 {
     return associatedNode;
 }
 
-void Block::setAssociatedNode( Node *value )
+void Block::setAssociatedNode( Nodo *value )
 {
     associatedNode = value;
 }
