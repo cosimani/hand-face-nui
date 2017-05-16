@@ -8,7 +8,7 @@
 #include "graph/nodo.hpp"
 #include "theme/colorizer.hpp"
 
-#include "image.hpp"
+#include "image.h"
 #include "common.hpp"
 
 namespace Ui

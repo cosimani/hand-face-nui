@@ -17,6 +17,7 @@ class Image : public QWidget
 private:
     QImage image;
     bool policy;
+    bool flag;
 
 public:
     explicit Image( QWidget *parent = NULL );
@@ -25,6 +26,10 @@ public:
 protected:
     void paintEvent( QPaintEvent* );
     void resizeEvent( QResizeEvent* );
+    void mousePressEvent(QMouseEvent *);
+
+signals:
+    void signal_clicked(bool mano);
 };
 
 #endif // IMAGE_HPP

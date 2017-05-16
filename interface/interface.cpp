@@ -5,7 +5,8 @@
 
 Interface::Interface( QWidget *parent ) : QWidget( parent ),
                                           ui( new Ui::Interface ),
-                                          cameraWidget( new CameraWidget )
+                                          cameraWidget( new CameraWidget ),
+                                          adb(new AdminDB)
 {
     this->setGraph( new Graph( this ) );
     this->setCamera( new Camera( this ) );
@@ -15,11 +16,6 @@ Interface::Interface( QWidget *parent ) : QWidget( parent ),
     ui->setupUi( this );
     ui->scrollArea->setFixedHeight( SCROLL_AREA_HEIGHT );
     this->setStyle();
-
-    connect( this->ui->calibrateButton,
-             SIGNAL( pressed() ),
-             this->getCamera(),
-             SLOT( calibrate() ) );
 
     connect( this->getCamera(),
              SIGNAL( positionDetected( int ) ),
@@ -45,11 +41,11 @@ Interface::Interface( QWidget *parent ) : QWidget( parent ),
     connect( this, SIGNAL( signal_opcionFinalElegida( int ) ),
              this, SLOT( slot_controlarSlider( int ) ) );
 
-    connect( ui->pbMano, SIGNAL( clicked( bool ) ),
-             this, SLOT( slot_laManoEstaAbierta( bool ) ) );
-
     connect( this->getCamera(), SIGNAL( signal_cursorTracking( QPoint ) ),
              this, SLOT( slot_posicionFeature( QPoint ) ) );
+
+    connect(ui->imgHand, SIGNAL(signal_clicked(bool)),
+            this, SLOT(slot_laManoEstaAbierta(bool)));
 
 
     /// Configuracion de los sliders
@@ -66,11 +62,108 @@ Interface::Interface( QWidget *parent ) : QWidget( parent ),
 
 //    ui->cameraWidget->setVisible( false );
 
+    // -----------------------------------jr------------------------------------------
+
+    ///jr: arranca la imagen de la mano abierta
+    /// pero no se muestra hasta que no se haya seleccionado la opcion
+    //  qDebug() << "WIDTH ELEGIDA:" << this->width()/5; ///jr: 111 en mi maquina
+    ui->imgHand->setMaximumWidth(this->width()/5);
+    ui->imgHand->setVisible(false);
+    QString iHand( DATA_PATH );
+    iHand.append( ICONS_PATH );
+    iHand.append( "open_hand.png" );
+    qDebug() << iHand.isEmpty();
+    ui->imgHand->setImage( iHand, ADJUST );
+
+    // creo la base de datos y la tabla si no exixten
+    QString dbname(DATABASE_PATH);
+    dbname.append(DATABASE_NAME);
+    getAdb()->conectar(dbname);
+    // creo base de datos si no estaba creada y creo tabla si no lo estaba
+    initDB();
+}
+
+
+void Interface::initDB()
+{
+    /*create tabla (funciona)
+CREATE TABLE IF NOT EXISTS estados(id INTEGER PRIMARY KEY ASC,
+                        luz_roja tinyint not null,
+                        luz_ambiente tinyint not null,
+                        uz_entrada tinyint not null,
+                        luz_azul tinyint not null);
+    */
+    QString tableEstados("CREATE TABLE IF NOT EXISTS estados(id INTEGER PRIMARY KEY ASC,"
+                         "luz_roja tinyint not null,"
+                         "luz_ambiente tinyint not null,"
+                         "luz_entrada tinyint not null,"
+                         "luz_azul tinyint not null"
+                         ");"
+                    );
+
+    QSqlQuery query = getAdb()->getDB().exec(tableEstados);
+
+    bool tablaNoExiste = query.isValid();
+    if(tablaNoExiste){
+        qDebug() << "query valid";
+        // no habia registros en la base de datos
+        QString s1 = QString::number(ui->slider1->getValorActual());
+        QString s2 = QString::number(ui->slider2->getValorActual());
+        QString s3 = QString::number(ui->slider3->getValorActual());
+        QString s4 = QString::number(ui->slider4->getValorActual());
+
+        dbInsertInitialValues(s1, s2, s3, s4);
+    } else {
+        qDebug() << "query INvalid";
+        // tengo que cargar los valres de la base de datos a los sliders
+        query = getAdb()->getDB().exec("SELECT * FROM estados");
+        query.next();
+        QSqlRecord registro = query.record();
+        QSqlField field;
+        field = registro.field("luz_roja");
+        QString s1 = field.value().toString();
+        field = registro.field("luz_ambiente");
+        QString s2 = field.value().toString();
+        field = registro.field("luz_entrada");
+        QString s3 = field.value().toString();
+        field = registro.field("luz_azul");
+        QString s4 = field.value().toString();
+
+        qDebug() << "luz_roja" << s1;
+        qDebug() << "luz_ambiente" << s2;
+        qDebug() << "luz_entrada" << s3;
+        qDebug() << "luz_azul" << s4;
+
+        ui->slider1->setValorActual(s1.toInt());
+        ui->slider2->setValorActual(s2.toInt());
+        ui->slider3->setValorActual(s3.toInt());
+        ui->slider4->setValorActual(s4.toInt());
+    }
+}
+
+// inserta valores actuales de los insert, para obtener un registro inicia
+void Interface::dbInsertInitialValues(QString s1, QString s2, QString s3, QString s4, int id){
+    QString insert("INSERT INTO estados(id, luz_roja, luz_ambiente, luz_entrada, luz_azul)"
+                   "VALUES("+ QString::number(id) + "," + s1 + "," + s2 + "," + s3 + "," + s4 +");");
+    QSqlQuery query = getAdb()->getDB().exec(insert);
+    qDebug() << "INITIAL INSERT:" << query.lastError();
+}
+
+// actualiza el registro con los valores de los sliders
+void Interface::updateEstados(QString s1, QString s2, QString s3, QString s4)
+{
+    QSqlQuery query = getAdb()->getDB().exec("UPDATE estados SET "
+                                             "luz_roja ="+ s1 +","
+                                              "luz_ambiente =" + s2 + ","
+                                              "luz_entrada =" + s3 + ","
+                                              "luz_azul ="+ s4 +";");
+//                                              "WHERE id =1;"); // en esta linea tira unrecognized token: "  \0WHERE\
+    //si la consulta tiene errores lo veo llamando a lastError
+    qDebug() << "UPDATE:" << query.lastError();
 }
 
 Interface::~Interface()
 {
-
 }
 
 void Interface::setStyle()
@@ -96,6 +189,15 @@ void Interface::changeStyle()
      this->setStyle();
 }
 
+AdminDB *Interface::getAdb() const
+{
+    return adb;
+}
+
+void Interface::setAdb(AdminDB *value)
+{
+    adb = value;
+}
 
 Graph *Interface::getGraph() const
 {
@@ -324,26 +426,34 @@ void Interface::phraseReset()
     qDebug() << "phraseReset";
 }
 
+/**
+  slot que se activa cuando se selecciona la imagen con la sonrisa.
+*/
 void Interface::slot_controlarSlider(int index)
 {
     switch( index )  {
     case 0:
         ui->slider1->setEnabled( true );
         ui->sentenceLabel->setText( "Luz roja" );
+        ui->imgHand->setVisible(true);
         break;
     case 1:
         ui->slider2->setEnabled( true );
         ui->sentenceLabel->setText( "Luz ambiente" );
+        ui->imgHand->setVisible(true);
         break;
     case 2:
         ui->slider3->setEnabled( true );
         ui->sentenceLabel->setText( "Luz de entrada" );
+        ui->imgHand->setVisible(true);
         break;
     case 3:
         ui->slider4->setEnabled( true );
         ui->sentenceLabel->setText( "Luz azul" );
+        ui->imgHand->setVisible(true);
         break;
-    default:;
+    default:
+        ui->sentenceLabel->setText( "" );
     }
 
     this->getCamera()->setTipoDeteccion( Camera::OnlySmile );
@@ -355,6 +465,10 @@ void Interface::slot_volverMenuInicio()
     ui->slider2->setEnabled( false );
     ui->slider3->setEnabled( false );
     ui->slider4->setEnabled( false );
+    ui->sentenceLabel->setText( "" );
+
+    ///jr: vuelvo invisible la imagen de la mano cuando sale de la seleccion
+    ui->imgHand->setVisible(false);
 
     ui->sentenceLabel->clear();
     this->phraseReset();
@@ -369,15 +483,31 @@ void Interface::slot_volverMenuInicio()
  */
 void Interface::slot_laManoEstaAbierta(bool abierta)
 {
-    if ( abierta == true && this->getCamera()->getTipoDeteccionActual() == Camera::Features )
+    QString hand(DATA_PATH);
+    hand.append(ICONS_PATH);
+
+    if ( abierta == true && this->getCamera()->getTipoDeteccionActual() == Camera::Features ){
         this->getCamera()->setTipoDeteccion( Camera::OnlySmile );
-    else if ( abierta == false )  {
+
+        hand.append("open_hand.png");
+        ui->imgHand->setImage( hand, ADJUST);
+
+        ///jr: TODO: aca guarda los valores de los sliders
+        QString s1 = QString::number(ui->slider1->getValorActual());
+        QString s2 = QString::number(ui->slider2->getValorActual());
+        QString s3 = QString::number(ui->slider3->getValorActual());
+        QString s4 = QString::number(ui->slider4->getValorActual());
+
+        updateEstados(s1,s2,s3,s4);
+    }
+    else if ( abierta == false ){
         this->getCamera()->setIsNeedCalibrated( true );
         this->getCamera()->setTipoDeteccion( Camera::Features );
+        hand.append("closed_hand.png");
+        ui->imgHand->setImage(hand, ADJUST);
     }
 
     abierta ? qDebug() << "Mano abierta" : qDebug() << "Mano cerrada";
-
 }
 
 void Interface::slot_posicionFeature( QPoint target )
@@ -410,7 +540,6 @@ void Interface::slot_posicionFeature( QPoint target )
 
     if ( ui->slider4->isEnabled() )
         ui->slider4->setValorActual( valor_nuevo );
-
 
 }
 

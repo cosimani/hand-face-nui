@@ -1,4 +1,4 @@
-QT += widgets multimedia opengl
+QT += widgets multimedia opengl sql
 
 DIR_OPENCV_LIBS = /usr/local/lib
 DIR_OTHER_LIBS = /usr/lib/x86_64-linux-gnu
@@ -41,14 +41,14 @@ SOURCES += \
     gesturerecognizer.cpp \
     slider.cpp \
     handdetection.cpp \
-    graph/nodo.cpp
+    graph/nodo.cpp \
+    database/admindb.cpp
 
 HEADERS += \
     graph/graph.hpp \
     graph/xmlreader.hpp \
     interface/block.hpp \
     interface/camerawidget.h \
-    interface/image.hpp \
     interface/interface.hpp \
     interface/texture.h \
     processor/camera.hpp \
@@ -62,7 +62,9 @@ HEADERS += \
     handdetection.h \
     skinfilter.h \
     skin.h \
-    graph/nodo.hpp
+    graph/nodo.hpp \
+    database/admindb.h \
+    interface/image.h
 
 FORMS += \
     interface/block.ui \
@@ -77,5 +79,9 @@ DISTFILES += \
     data/icons/luz_ambiente.png \
     data/icons/luz_azul.png \
     data/icons/luz_entrada.png \
-    data/icons/luz_roja.png
+    data/icons/luz_roja.png \
+    database/sensors.sqlite \
+    data/db/sensors.sqlite \
+    data/icons/closed_hand.png \
+    data/icons/open_hand.png
 

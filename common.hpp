@@ -12,4 +12,8 @@
 #define ICONS_PATH "icons/"
 #define XML_PATH "xml/"
 
+#define DATABASE_PATH "../hand-face-nui/data/db/"
+#define DATABASE_NAME "sensors.sqlite"
+
 #endif // COMMON_HPP
+

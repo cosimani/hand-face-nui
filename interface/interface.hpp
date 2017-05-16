@@ -8,12 +8,15 @@
 #include <QList>
 #include <QKeyEvent>
 #include <QSound>
+#include <QSqlError>
+#include <QSqlField>
 
 #include "graph/graph.hpp"
 #include "theme/colorizer.hpp"
 #include "interface/block.hpp"
 #include "processor/camera.hpp"
 #include "interface/camerawidget.h"
+#include "database/admindb.h"
 
 #include "common.hpp"
 
@@ -40,6 +43,11 @@ private:
 
     CameraWidget * cameraWidget;
 
+    AdminDB * adb;
+    void initDB();
+    void updateEstados(QString s1, QString s2, QString s3, QString s4);
+    void dbInsertInitialValues(QString s1, QString s2, QString s3, QString s4, int id = 1);
+
 public:
 
     explicit Interface( QWidget *parent = NULL );
@@ -58,6 +66,9 @@ public:
     void setBlockSelection( bool value );
 
     bool initInterface( QFile *file );
+
+    AdminDB *getAdb() const;
+    void setAdb(AdminDB *value);
 
 protected:
 

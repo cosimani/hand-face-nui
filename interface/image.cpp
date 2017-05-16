@@ -1,7 +1,8 @@
-#include "image.hpp"
+#include "image.h"
 
 Image::Image( QWidget *parent ) :
-    QWidget( parent )
+    QWidget( parent ),
+    flag(false)
 {
 
 }
@@ -41,4 +42,15 @@ void Image::paintEvent( QPaintEvent* )
 void Image::resizeEvent( QResizeEvent* )
 {
     this->repaint();
+}
+
+void Image::mousePressEvent(QMouseEvent *)
+{
+    if(flag){
+        emit signal_clicked(true);
+        flag = false;
+    }else{
+        emit signal_clicked(false);
+        flag = true;
+    }
 }
