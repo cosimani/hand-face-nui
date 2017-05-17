@@ -30,6 +30,7 @@ public:
     enum TipoDeteccion { HaarCascades, Features, OnlySmile, Features_and_hand };
 
     explicit Camera( QObject *parent = NULL );
+    virtual ~Camera();
 
     VideoCapture *getVideoCapture() const;
     void setVideoCapture( VideoCapture *value );

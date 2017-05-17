@@ -35,6 +35,11 @@ Camera::Camera( QObject *parent ) : QObject( parent ),
     this->getSceneTimer()->start( 10 );
 }
 
+Camera::~Camera()
+{
+    videoCapture->release();
+}
+
 VideoCapture *Camera::getVideoCapture() const
 {
     return videoCapture;
@@ -131,6 +136,9 @@ void Camera::setIsNeedCalibrated(bool value)
 
 void Camera::process()
 {
+    if ( ! videoCapture->isOpened() )
+        return;
+
     this->getVideoCapture()->operator >>( *this->getCameraTexture() );
 
     // Esta signal envia el nuevo Mat a la interfaz para que la pueda visualizar

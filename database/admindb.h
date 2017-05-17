@@ -14,7 +14,7 @@ class AdminDB : public QObject
     QSqlDatabase db;
 
 public:
-    AdminDB();
+    AdminDB(QObject * parent = 0);
     ~AdminDB();
 
     bool conectar(QString archivo);

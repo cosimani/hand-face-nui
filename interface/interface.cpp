@@ -6,7 +6,7 @@
 Interface::Interface( QWidget *parent ) : QWidget( parent ),
                                           ui( new Ui::Interface ),
                                           cameraWidget( new CameraWidget ),
-                                          adb(new AdminDB)
+                                          adb( new AdminDB( this ) )
 {
     this->setGraph( new Graph( this ) );
     this->setCamera( new Camera( this ) );
@@ -157,13 +157,14 @@ void Interface::updateEstados(QString s1, QString s2, QString s3, QString s4)
                                               "luz_ambiente =" + s2 + ","
                                               "luz_entrada =" + s3 + ","
                                               "luz_azul ="+ s4 +";");
-//                                              "WHERE id =1;"); // en esta linea tira unrecognized token: "  \0WHERE\
+//                                              "WHERE id =1;");  en esta linea tira unrecognized token:  /0WHERE/
     //si la consulta tiene errores lo veo llamando a lastError
     qDebug() << "UPDATE:" << query.lastError();
 }
 
 Interface::~Interface()
 {
+    delete camera;
 }
 
 void Interface::setStyle()
@@ -301,7 +302,10 @@ void Interface::keyPressEvent( QKeyEvent *event )
         break;
 
     case Qt::Key_Escape:
+
+        camera->getVideoCapture()->release();
         this->close();
+
         break;
 
     case Qt::Key_Space:  // Para calibrar. Igual a sonreir por primera vez, o pulsar el boton Calibrar

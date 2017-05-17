@@ -1,6 +1,6 @@
 #include "admindb.h"
 
-AdminDB::AdminDB()
+AdminDB::AdminDB(QObject *parent) : QObject( parent )
 {
     db = QSqlDatabase::addDatabase("QSQLITE");
 }
@@ -57,6 +57,9 @@ bool AdminDB::insertarFecha(QString fecha)
 
     return query.exec("INSERT INTO logs (fecha) VALUES('"+ fecha +"')");
 }
+
+
+
 
 
 
