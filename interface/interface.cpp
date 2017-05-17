@@ -381,6 +381,9 @@ void Interface::activateBlock( int index )
         blocksList.at( index )->setActive( true );
     }
     else if ( index == -1 )  {
+
+        ui->sentenceLabel->setText( "" );
+
         for( int i = 0; i < blocksList.size(); i++ )
         {
             blocksList.at( i )->setActive( false );

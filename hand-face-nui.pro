@@ -25,6 +25,48 @@ unix:LIBS += -lopencv_core \
              -lopencv_videoio \
 #             -lopencv_bgsegm
 
+win32:DIR_OPENCV_LIBS = C:/Qt/OpenCV-3.1.0
+
+win32:INCLUDEPATH += "$$DIR_OPENCV_LIBS/opencv/sources/include"
+win32:INCLUDEPATH += "$$DIR_OPENCV_LIBS/opencv/sources/modules/core/include"
+win32:INCLUDEPATH += "$$DIR_OPENCV_LIBS/opencv/sources/modules/imgproc/include"
+win32:INCLUDEPATH += "$$DIR_OPENCV_LIBS/opencv/sources/modules/video/include"
+win32:INCLUDEPATH += "$$DIR_OPENCV_LIBS/opencv/sources/modules/flann/include"
+win32:INCLUDEPATH += "$$DIR_OPENCV_LIBS/opencv/sources/modules/features2d/include"
+win32:INCLUDEPATH += "$$DIR_OPENCV_LIBS/opencv/sources/modules/calib3d/include"
+win32:INCLUDEPATH += "$$DIR_OPENCV_LIBS/opencv/sources/modules/legacy/include"
+win32:INCLUDEPATH += "$$DIR_OPENCV_LIBS/opencv/sources/modules/objdetect/include"
+win32:INCLUDEPATH += "$$DIR_OPENCV_LIBS/opencv/sources/modules/highgui/include"
+win32:INCLUDEPATH += "$$DIR_OPENCV_LIBS/opencv/sources/modules/photo/include"
+win32:INCLUDEPATH += "$$DIR_OPENCV_LIBS/opencv/sources/modules/ml/include"
+win32:INCLUDEPATH += "$$DIR_OPENCV_LIBS/opencv/sources/modules/contrib/include"
+win32:INCLUDEPATH += "$$DIR_OPENCV_LIBS/opencv/sources/modules/hal/include"
+win32:INCLUDEPATH += "$$DIR_OPENCV_LIBS/opencv/sources/modules/imgcodecs/include"
+win32:INCLUDEPATH += "$$DIR_OPENCV_LIBS/opencv/sources/modules/videoio/include"
+
+win32:LIBS += -L"$$DIR_OPENCV_LIBS/opencv/compilado/lib"
+
+win32:LIBS += -lopencv_core310.dll
+win32:LIBS += -lopencv_highgui310.dll
+win32:LIBS += -lopencv_imgproc310.dll
+win32:LIBS += -lopencv_objdetect310.dll
+#win32:LIBS += -lopencv_calib3d310.dll
+
+#win32:LIBS += -lopencv_ml310.dll
+win32:LIBS += -lopencv_video310.dll
+#win32:LIBS += -lopencv_features2d310.dll
+#win32:LIBS += -lopencv_flann310.dll
+#win32:LIBS += -lopencv_photo310.dll
+#win32:LIBS += -lopencv_stitching310.dll
+#win32:LIBS += -lopencv_superres310.dll
+#win32:LIBS += -lopencv_video310.dll
+#win32:LIBS += -lopencv_videostab310.dll
+#win32:LIBS += -lopencv_imgcodecs310.dll
+win32:LIBS += -lopencv_videoio310.dll
+
+win32:LIBS += -lopengl32
+win32:LIBS += -lglu32
+
 SOURCES += \
     main.cpp \
     graph/graph.cpp \

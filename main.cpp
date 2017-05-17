@@ -15,14 +15,14 @@ int main( int argc, char **argv )
     xml.append( "nui.xml" );
     QFile file( xml );
 
-    Interface *interface = new Interface();
-    interface->showMaximized();
-//    interface->show();
-//    interface->resize(QApplication::desktop()->screenGeometry().width(),
+    Interface *interfaz = new Interface();
+    interfaz->showMaximized();
+//    interfaz->show();
+//    interfaz->resize(QApplication::desktop()->screenGeometry().width(),
 //                      QApplication::desktop()->screenGeometry().height()/2);
-//    interface->move(0,0);
+//    interfaz->move(0,0);
 
-    interface->initInterface( &file );
+    interfaz->initInterface( &file );
 
     return app.exec();
 }
