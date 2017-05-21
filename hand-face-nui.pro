@@ -7,6 +7,7 @@ unix:INCLUDEPATH += "/usr/include/GL/"
 
 unix:LIBS += -L$$DIR_OPENCV_LIBS
 
+
 unix:LIBS += -lopencv_core \
              -lopencv_highgui \
              -lopencv_imgproc \
