@@ -1,6 +1,8 @@
 #ifndef CAMERAWIDGET_H
 #define CAMERAWIDGET_H
 
+#ifndef RASPBERRY
+
 #define RESOLUTION_WIDTH  640
 #define RESOLUTION_HEIGHT 480
 
@@ -37,5 +39,6 @@ public slots:
 
 };
 
+#endif
 
 #endif // CAMERAWIDGET_H

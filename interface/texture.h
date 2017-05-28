@@ -1,6 +1,8 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
+#ifndef RASPBERRY
+
 #include <QGLWidget>
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -45,5 +47,7 @@ public:
 
     }
 };
+
+#endif
 
 #endif // TEXTURE_H

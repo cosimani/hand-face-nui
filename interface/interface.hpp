@@ -7,7 +7,13 @@
 #include <QPalette>
 #include <QList>
 #include <QKeyEvent>
+
+#ifndef RASPBERRY
+
 #include <QSound>
+
+#endif
+
 #include <QSqlError>
 #include <QSqlField>
 
@@ -41,7 +47,11 @@ private:
     void setStyle();
     void changeStyle();
 
+#ifndef RASPBERRY
+
     CameraWidget * cameraWidget;
+
+#endif
 
     AdminDB * adb;
     void initDB();
@@ -73,7 +83,7 @@ public:
 protected:
 
     void keyPressEvent( QKeyEvent *event );
-    void resizeEvent( QResizeEvent * e );
+    void resizeEvent(QResizeEvent *);
 
 private slots:
 

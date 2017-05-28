@@ -3,12 +3,15 @@
 
 #include <QObject>
 #include <QTimer>
+#include <QPoint>
 
 #include <vector>
 
 #include <opencv/highgui.h>
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include <opencv2/videoio/videoio.hpp>
+#include <opencv2/objdetect/objdetect.hpp>
 
 #include "common.hpp"
 

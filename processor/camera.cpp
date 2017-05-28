@@ -308,8 +308,8 @@ void Camera::process()
 
             roi.x = roi.x + roi.width / ( double )3;
             roi.y = roi.y + roi.height / ( double )2;
-            roi.width = roi.width * 1 / ( double )3;
-            roi.height = roi.height * 1 / ( double )3;
+            roi.width = roi.width / ( double )3;
+            roi.height = roi.height / ( double )3;
         }
 
         // Esta es la region de la nariz

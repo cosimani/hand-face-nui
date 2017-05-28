@@ -1,3 +1,5 @@
+#ifndef RASPBERRY
+
 #include "camerawidget.h"
 
 CameraWidget::CameraWidget( QWidget *parent ) : QGLWidget( parent ),
@@ -77,4 +79,5 @@ void CameraWidget::paintGL()
     glFlush();
 }
 
+#endif
 

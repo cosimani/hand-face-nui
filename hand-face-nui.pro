@@ -1,13 +1,18 @@
-QT += widgets multimedia opengl sql
+QT += widgets sql
+
+# Si se define, entonces no usara multimedia ni opengl
+DEFINES += RASPBERRY
+
+! defined(RASPBERRY)  {
+#    QT += multimedia opengl
+#    unix:INCLUDEPATH += "/usr/include/GL/"
+}
 
 DIR_OPENCV_LIBS = /usr/local/lib
 DIR_OTHER_LIBS = /usr/lib/x86_64-linux-gnu
 
-unix:INCLUDEPATH += "/usr/include/GL/"
 
 unix:LIBS += -L$$DIR_OPENCV_LIBS
-
-#
 
 unix:LIBS += -lopencv_core \
              -lopencv_highgui \

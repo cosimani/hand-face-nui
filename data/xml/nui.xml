@@ -6,33 +6,33 @@
 		<id>inicio</id>
 		<title>Inicio</title>
 		<icon>inicio.png</icon>
-		<children>_luz1, _luz2, _luz3, _luz4, _luz5, _luz6</children>
+		<children>_device1, _device2, _device3, _device4</children>
 	</node>
 
 	<node>
-		<id>_luz1</id>
-		<title>Luz roja</title>
+		<id>_device1</id>
+		<title>Home temperature</title>
 		<icon>luz_roja.png</icon>
 		<children>none</children>
 	</node>
 	
 	<node>
-		<id>_luz2</id>
-		<title>Luz ambiente</title>
+		<id>_device2</id>
+		<title>Ambient light</title>
 		<icon>luz_ambiente.png</icon>
 		<children>none</children>
 	</node>
 
 	<node>
-		<id>_luz3</id>
-		<title>Luz entrada</title>
+		<id>_device3</id>
+		<title>Baby room temperature</title>
 		<icon>luz_entrada.png</icon>
 		<children>none</children>
 	</node>
 
 	<node>
-		<id>_luz4</id>
-		<title>Luz azul</title>
+		<id>_device4</id>
+		<title>Ambient music volume</title>
 		<icon>luz_azul.png</icon>
 		<children>none</children>
 	</node>

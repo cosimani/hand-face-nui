@@ -5,7 +5,6 @@
 
 Interface::Interface( QWidget *parent ) : QWidget( parent ),
                                           ui( new Ui::Interface ),
-                                          cameraWidget( new CameraWidget ),
                                           adb( new AdminDB( this ) )
 {
     this->setGraph( new Graph( this ) );
@@ -29,8 +28,14 @@ Interface::Interface( QWidget *parent ) : QWidget( parent ),
              SIGNAL( timeout() ),
              SLOT( unblockSelection() ) );
 
+#ifndef RASPBERRY
+
+    cameraWidget = new CameraWidget;
+
     connect( camera, SIGNAL( signal_newCameraFrame(cv::Mat*) ),
              cameraWidget, SLOT( slot_setCameraTexture(cv::Mat*) ) );
+
+#endif
 
     connect( camera, SIGNAL( signal_nonFaceDetected() ),
              this, SLOT( phraseReset() ) );
@@ -279,6 +284,8 @@ void Interface::keyPressEvent( QKeyEvent *event )
 
         break;
 
+#ifndef RASPBERRY
+
     case Qt::Key_W:  // Mostrar el widget de la camara para ver que esta tomando
         if ( cameraWidget->isVisible() )  {
             cameraWidget->setParent(NULL);
@@ -301,6 +308,8 @@ void Interface::keyPressEvent( QKeyEvent *event )
         }
         break;
 
+#endif
+
     case Qt::Key_Escape:
 
         camera->getVideoCapture()->release();
@@ -317,8 +326,11 @@ void Interface::keyPressEvent( QKeyEvent *event )
     }
 }
 
-void Interface::resizeEvent(QResizeEvent *e)
+void Interface::resizeEvent(QResizeEvent *)
 {
+
+#ifndef RASPBERRY
+
 //    cameraWidget->setWindowFlags( cameraWidget->windowFlags() | Qt::WindowStaysOnTopHint );
     cameraWidget->setWindowFlags( Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint );
 
@@ -329,6 +341,9 @@ void Interface::resizeEvent(QResizeEvent *e)
     cameraWidget->setFocusPolicy(Qt::NoFocus);
 
 //    cameraWidget->show();
+
+#endif
+
 }
 
 void Interface::createAndSet( Nodo *node )
@@ -400,10 +415,13 @@ void Interface::clickBlock( int index )
 {
     if( !this->getBlockSelection() )
     {
+
+#ifndef RASPBERRY
         QString sound( APPLICATION_PATH );
         sound.append( SOUNDS_PATH );
         sound.append( "selected.wav" );
         QSound::play( sound );
+#endif
 
         QList< Block* > blocksList = this->findChildren< Block* >();
         if( index >= 0 && index < blocksList.size() )
