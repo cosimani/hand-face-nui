@@ -10,11 +10,13 @@
 using namespace cv;
 using namespace std;
 
-class HandDetection
+class HandDetection : public QObject
 {
+    Q_OBJECT
+
 
 public:
-    HandDetection();
+    HandDetection(QObject * parent = 0);
 
     SkinFilter *refSkin;
 
@@ -65,6 +67,20 @@ private:
     void dibujarLineasEntreDedos(Mat &frame, vector<Point> hull, double &distanciaEuclidian, double &sumatoriaDistancia);
     void drawLinesBetweenFingers(Mat &frame, vector<Point> hull, double &distanciaEuclidian, double &sumatoriaDistancia);
     void drawLitleBinaryImage(Mat &frame, Mat &binaryCopy);
+
+
+signals:
+    void signal_cambioEstado_hayMano_o_no( bool hay );
+    void signal_estado_manoAbierta_o_cerrada( bool abierta );
+
+private:
+    // Guarda el estado, si hay o no mano presente. Del metodo isHandInFrame. Si esta variable cambia de estado, se
+    // envia la signal_cambioEstado_hayMano_o_no. True si hay mano, false cuando NO hay mano.
+    bool estado_hayMano_o_no;    
+
+    // Guarda el estado, si la mano esta abierta o cerrada. Si esta variable cambia de estado, se
+    // envia la signal_estado_manoAbierta_o_cerrada. True si la mano esta abierta, false cuando esta cerrada.
+    bool estado_manoAbierta_o_cerrada;
 };
 
 #endif // HANDDETECTION_H

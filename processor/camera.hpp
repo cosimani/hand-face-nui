@@ -11,7 +11,9 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/videoio/videoio.hpp>
+#include <opencv2/videoio/videoio_c.h>
 #include <opencv2/objdetect/objdetect.hpp>
+#include <opencv2/video/background_segm.hpp>
 
 #include "common.hpp"
 
@@ -30,7 +32,15 @@ class Camera : public QObject
 
 public:
 
-    enum TipoDeteccion { HaarCascades, Features, OnlySmile, Features_and_hand };
+    enum TipoDeteccion { HaarCascades = 1,
+                         Features = 2,
+                         OnlySmile = 4,
+                         BackgroundCapture = 8,
+//                         Features_and_hand = 32,
+                         Hand = 16,
+                         Features_and_hand = Hand | Features,
+                         Hand_and_Smile = Hand | OnlySmile
+                       };
 
     explicit Camera( QObject *parent = NULL );
     virtual ~Camera();
@@ -62,6 +72,29 @@ public:
 
     bool getIsNeedCalibrated() const;
     void setIsNeedCalibrated(bool value);
+
+
+
+    void setMuestraProcesada(bool value);
+
+    bool getMuestraProcesada() const;
+
+    void capturarFondo();
+
+    void setSbUpValue(int value);
+
+    void setSbDownValue(int value);
+
+    int getSbUpValue() const;
+
+    int getSbDownValue() const;
+
+    bool getProcesarUnaSolaImagen() const;
+    void setProcesarUnaSolaImagen(bool value);
+
+    void setYaSeTomoOriginal(bool value);
+
+    HandDetection *getHandDetector() const;
 
 private:
 
@@ -98,12 +131,44 @@ private:
 
     bool isNeedCalibrated;
 
+    Ptr<cv::BackgroundSubtractorMOG2> mog2;
+    int backgroundFrame;
+    bool muestraProcesada;
+    Mat back;
+    Mat fore;
+    int sbUpValue;
+    int sbDownValue;
+    bool isBackgroundCapturado;
+
+    Point baricenter;
+    int lastFingers;
+    vector< Point > relevants;
+
+
+    void processFingers(Mat &frame);
+
+    double distance(Point a, Point b);
+
+    void processMenuPrincipal( Mat &frame );
+    void processSmile( Mat &frame );
+    void borrarRostro(Mat &frame , bool negro = false);
+    void sustraerFondo( Mat &frame , bool ponerEnBlanco = true );
+
+    Mat frameParaProcesar;
+    Mat originalframeParaProcesar;
+    bool procesarUnaSolaImagen;
+    bool yaSeTomoOriginal;
+
     HandDetection * handDetector;
+    // referencia de los colores de la piel
+    SkinFilter *refSkin;
+
 
 
 private slots:
 
     void process();
+
 
 public slots:
 
@@ -138,6 +203,12 @@ signals:
      * deberia quedar el mouse, en caso de desear controlarlo.
      */
     void signal_cursorTracking( QPoint );
+
+
+    void manoAbiertaCerrada( bool );
+    void message( QString text );
+
+    void signal_deteccionDedosJuntos();
 };
 
 #endif // CAMERA_HPP

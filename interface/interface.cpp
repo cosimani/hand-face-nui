@@ -28,6 +28,8 @@ Interface::Interface( QWidget *parent ) : QWidget( parent ),
              SIGNAL( timeout() ),
              SLOT( unblockSelection() ) );
 
+    connect(ui->pbBackgroundCapture, SIGNAL(pressed()), this, SLOT(slot_capturarFondo()));
+
 #ifndef RASPBERRY
 
     cameraWidget = new CameraWidget;
@@ -49,8 +51,20 @@ Interface::Interface( QWidget *parent ) : QWidget( parent ),
     connect( this->getCamera(), SIGNAL( signal_cursorTracking( QPoint ) ),
              this, SLOT( slot_posicionFeature( QPoint ) ) );
 
-    connect(ui->imgHand, SIGNAL(signal_clicked(bool)),
-            this, SLOT(slot_laManoEstaAbierta(bool)));
+    // Con la imagen de la mano
+//    connect(ui->imgHand, SIGNAL(signal_clicked(bool)),
+//            this, SLOT(slot_laManoEstaAbierta(bool)));
+
+    // Con la mano misma
+    connect( this->getCamera(), SIGNAL( manoAbiertaCerrada( bool ) ),
+             this, SLOT( slot_laManoEstaAbierta( bool ) ) );
+
+
+    connect( this->getCamera()->getHandDetector(), SIGNAL(signal_cambioEstado_hayMano_o_no(bool)),
+             this, SLOT(slot_cambioEstado_hayMano(bool)));
+
+    connect( this->getCamera()->getHandDetector(), SIGNAL(signal_estado_manoAbierta_o_cerrada(bool)),
+             this, SLOT(slot_estado_manoAbierta_o_cerrada(bool)));
 
 
     /// Configuracion de los sliders
@@ -86,6 +100,15 @@ Interface::Interface( QWidget *parent ) : QWidget( parent ),
     getAdb()->conectar(dbname);
     // creo base de datos si no estaba creada y creo tabla si no lo estaba
     initDB();
+
+
+//    this->slot_capturarFondo();
+
+//    QKeyEvent keyPressed(QKeyEvent::KeyPress, Qt::Key_W, Qt::NoModifier);
+//    this->keyPressEvent(&keyPressed);
+
+
+    valorInicialFeature = 0;
 }
 
 
@@ -272,7 +295,7 @@ void Interface::keyPressEvent( QKeyEvent *event )
 {
     switch( event->key() )
     {
-    case Qt::Key_S:  // Cambia los colores de la interfaz
+    case Qt::Key_B:  // Cambia los colores de la interfaz
         this->changeStyle();
         break;
 
@@ -285,6 +308,42 @@ void Interface::keyPressEvent( QKeyEvent *event )
         break;
 
 #ifndef RASPBERRY
+
+    case Qt::Key_P:  // Para mostrar en el CameraWidget la imagen procesada o no
+
+        this->getCamera()->getMuestraProcesada() ? this->getCamera()->setMuestraProcesada( false )
+                                                 : this->getCamera()->setMuestraProcesada( true );
+
+        break;
+
+    case Qt::Key_A:  // Para aumentar el valor superior del Lab
+        this->getCamera()->setSbUpValue( this->getCamera()->getSbUpValue() + 1 );
+        qDebug() << this->getCamera()->getSbDownValue() << "x" << this->getCamera()->getSbUpValue();
+        break;
+    case Qt::Key_Z:  // Para aumentar el valor superior del Lab
+        this->getCamera()->setSbUpValue( this->getCamera()->getSbUpValue() - 1 );
+        qDebug() << this->getCamera()->getSbDownValue() << "x" << this->getCamera()->getSbUpValue();
+        break;
+    case Qt::Key_S:  // Para aumentar el valor inferior del Lab
+        this->getCamera()->setSbDownValue( this->getCamera()->getSbDownValue() + 1 );
+        qDebug() << this->getCamera()->getSbDownValue() << "x" << this->getCamera()->getSbUpValue();
+        break;
+    case Qt::Key_X:  // Para aumentar el valor inferior del Lab
+        this->getCamera()->setSbDownValue( this->getCamera()->getSbDownValue() - 1 );
+        qDebug() << this->getCamera()->getSbDownValue() << "x" << this->getCamera()->getSbUpValue();
+        break;
+
+
+    case Qt::Key_D:  // Para detener y procesar la misma imagen sin detener el timer
+        if ( this->getCamera()->getProcesarUnaSolaImagen() )  {
+            this->getCamera()->setProcesarUnaSolaImagen( false );
+            this->getCamera()->setYaSeTomoOriginal( false );
+        }
+        else  {
+            this->getCamera()->setProcesarUnaSolaImagen( true );
+        }
+        break;
+
 
     case Qt::Key_W:  // Mostrar el widget de la camara para ver que esta tomando
         if ( cameraWidget->isVisible() )  {
@@ -308,6 +367,29 @@ void Interface::keyPressEvent( QKeyEvent *event )
         }
         break;
 
+    case Qt::Key_F:  // Mostrar el widget de la camara en modo maximizado
+        if ( cameraWidget->isVisible() )  {
+            cameraWidget->setParent(NULL);
+//            cameraWidget->move( 0, this->height() );
+            cameraWidget->hide();
+        }
+        else  {
+//            cameraWidget->setWindowFlags( Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint | Qt::Window );
+            cameraWidget->setWindowFlags( Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint );
+
+            cameraWidget->resize( this->width(), this->height() );
+            cameraWidget->move( 0, 0 );
+
+            // Le quitamos el focu para que no impida detectar las teclas
+            cameraWidget->setFocusPolicy(Qt::NoFocus);
+
+            cameraWidget->setParent(this);
+
+            cameraWidget->show();
+        }
+        break;
+
+
 #endif
 
     case Qt::Key_Escape:
@@ -326,7 +408,7 @@ void Interface::keyPressEvent( QKeyEvent *event )
     }
 }
 
-void Interface::resizeEvent(QResizeEvent *)
+void Interface::resizeEvent(QResizeEvent *e)
 {
 
 #ifndef RASPBERRY
@@ -342,6 +424,8 @@ void Interface::resizeEvent(QResizeEvent *)
 
 //    cameraWidget->show();
 
+#else
+    Q_UNUSED(e)
 #endif
 
 }
@@ -481,7 +565,9 @@ void Interface::slot_controlarSlider(int index)
         ui->sentenceLabel->setText( "" );
     }
 
-    this->getCamera()->setTipoDeteccion( Camera::OnlySmile );
+//    this->getCamera()->setTipoDeteccion( Camera::OnlySmile );
+//    this->getCamera()->setTipoDeteccion( Camera::Features_and_hand );
+    this->getCamera()->setTipoDeteccion( Camera::Hand_and_Smile );
 }
 
 void Interface::slot_volverMenuInicio()
@@ -508,51 +594,94 @@ void Interface::slot_volverMenuInicio()
  */
 void Interface::slot_laManoEstaAbierta(bool abierta)
 {
-    QString hand(DATA_PATH);
-    hand.append(ICONS_PATH);
+//    qDebug() << "slot_laManoEstaAbierta ----- Mano abierta" << abierta;
 
-    if ( abierta == true && this->getCamera()->getTipoDeteccionActual() == Camera::Features ){
-        this->getCamera()->setTipoDeteccion( Camera::OnlySmile );
+//    QString hand(DATA_PATH);
+//    hand.append(ICONS_PATH);
 
-        hand.append("open_hand.png");
-        ui->imgHand->setImage( hand, ADJUST);
+//    if ( abierta == true && this->getCamera()->getTipoDeteccionActual() == Camera::Features ){
+//        this->getCamera()->setTipoDeteccion( Camera::OnlySmile );
 
-        ///jr: TODO: aca guarda los valores de los sliders
-        QString s1 = QString::number(ui->slider1->getValorActual());
-        QString s2 = QString::number(ui->slider2->getValorActual());
-        QString s3 = QString::number(ui->slider3->getValorActual());
-        QString s4 = QString::number(ui->slider4->getValorActual());
+//        hand.append("open_hand.png");
+//        ui->imgHand->setImage( hand, ADJUST);
 
-        updateEstados(s1,s2,s3,s4);
-    }
-    else if ( abierta == false ){
-        this->getCamera()->setIsNeedCalibrated( true );
-        this->getCamera()->setTipoDeteccion( Camera::Features );
-        hand.append("closed_hand.png");
-        ui->imgHand->setImage(hand, ADJUST);
-    }
+//        ///jr: TODO: aca guarda los valores de los sliders
+//        QString s1 = QString::number(ui->slider1->getValorActual());
+//        QString s2 = QString::number(ui->slider2->getValorActual());
+//        QString s3 = QString::number(ui->slider3->getValorActual());
+//        QString s4 = QString::number(ui->slider4->getValorActual());
 
-    abierta ? qDebug() << "Mano abierta" : qDebug() << "Mano cerrada";
+//        updateEstados(s1,s2,s3,s4);
+//    }
+//    else if ( abierta == false ){
+//        this->getCamera()->setIsNeedCalibrated( true );
+//        this->getCamera()->setTipoDeteccion( Camera::Features );
+//        hand.append("closed_hand.png");
+//        ui->imgHand->setImage(hand, ADJUST);
+//    }
+
+
+
+
+
+//    QString hand(DATA_PATH);
+//    hand.append(ICONS_PATH);
+
+//    if ( abierta == true && this->getCamera()->getTipoDeteccionActual() == Camera::Features ){
+//        this->getCamera()->setTipoDeteccion( Camera::OnlySmile );
+
+//        hand.append("open_hand.png");
+//        ui->imgHand->setImage( hand, ADJUST);
+
+//        ///jr: TODO: aca guarda los valores de los sliders
+//        QString s1 = QString::number(ui->slider1->getValorActual());
+//        QString s2 = QString::number(ui->slider2->getValorActual());
+//        QString s3 = QString::number(ui->slider3->getValorActual());
+//        QString s4 = QString::number(ui->slider4->getValorActual());
+
+//        updateEstados(s1,s2,s3,s4);
+//    }
+//    else if ( abierta == false ){
+//        this->getCamera()->setIsNeedCalibrated( true );
+//        this->getCamera()->setTipoDeteccion( Camera::Features );
+//        hand.append("closed_hand.png");
+//        ui->imgHand->setImage(hand, ADJUST);
+//    }
+
+//    abierta ? qDebug() << "Mano abierta" : qDebug() << "Mano cerrada";
 }
 
 void Interface::slot_posicionFeature( QPoint target )
 {
-    int minSlider = 0;
-    int maxSlider = 100;
+    // No tenemos en cuenta los ceros porque es cuando se esta calibrando, directamente lo descartamos.
+    // Habria que reverlo.
+    if ( target.x() == 0 )  {
+        return;
+    }
 
-    int minMouse = 310;
-    int maxMouse = 345;
+    // Si es cero es porque es la primera vez que entra.
+    // Lo ponemos de nuevo en cero cuando la mano se abre, en el slot_estado_manoAbierta_o_cerrada
+    if ( valorInicialFeature == 0 )
+        valorInicialFeature = target.x();
 
-    float relacion = float( maxSlider - minSlider ) / float( maxMouse - minMouse );
+//    int minSlider = 0;
+//    int maxSlider = 100;
 
-    int valor_nuevo = float( target.x() - minMouse ) * relacion;
+//    int minMouse = 310;
+//    int maxMouse = 345;
+
+//    float relacion = float( maxSlider - minSlider ) / float( maxMouse - minMouse );
+
+//    int valor_nuevo = float( target.x() - minMouse ) * relacion;
+
+    int valor_nuevo = target.x() - valorInicialFeature + 50;
 
     if ( valor_nuevo <= 0 )  valor_nuevo = 0;
     if ( valor_nuevo >= 100 )  valor_nuevo = 100;
 
     valor_nuevo = 100 - valor_nuevo;
 
-    qDebug() << QString::number(target.x() );
+    qDebug() << QString::number( target.x() ) << valor_nuevo;
 
     if ( ui->slider1->isEnabled() )
         ui->slider1->setValorActual( valor_nuevo );
@@ -565,6 +694,30 @@ void Interface::slot_posicionFeature( QPoint target )
 
     if ( ui->slider4->isEnabled() )
         ui->slider4->setValorActual( valor_nuevo );
+
+}
+
+void Interface::slot_capturarFondo()
+{
+    this->getCamera()->setTipoDeteccion( Camera::BackgroundCapture );
+
+}
+
+void Interface::slot_cambioEstado_hayMano(bool hay)
+{
+    qDebug() << "Hay manooooooooooo" << hay;
+}
+
+void Interface::slot_estado_manoAbierta_o_cerrada(bool abierta)
+{
+    qDebug() << "Mano abieraaaaaaaaaaaaaa" << abierta;
+
+    if ( abierta )  {
+        this->getCamera()->setTipoDeteccion( Camera::Hand_and_Smile );
+        valorInicialFeature = 0;
+    }
+    else
+        this->getCamera()->setTipoDeteccion( Camera::Features_and_hand );
 
 }
 

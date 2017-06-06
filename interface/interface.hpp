@@ -44,6 +44,10 @@ private:
     QTimer *blockSelectionTimer;
     bool blockSelection;
 
+    // aqui almacenamos el primer valor de x cuando el usuario quiere controlar el slidar.
+    // Este valor va a corresponder al valor 50 del slider (siendo su rango entre 0 y 100.
+    int valorInicialFeature;
+
     void setStyle();
     void changeStyle();
 
@@ -83,7 +87,7 @@ public:
 protected:
 
     void keyPressEvent( QKeyEvent *event );
-    void resizeEvent(QResizeEvent *);
+    void resizeEvent(QResizeEvent *e);
 
 private slots:
 
@@ -97,6 +101,11 @@ private slots:
     void slot_volverMenuInicio();
     void slot_laManoEstaAbierta( bool abierta );
     void slot_posicionFeature( QPoint target );
+
+    void slot_capturarFondo();
+
+    void slot_cambioEstado_hayMano( bool hay );
+    void slot_estado_manoAbierta_o_cerrada( bool abierta );
 
 signals:
     /**

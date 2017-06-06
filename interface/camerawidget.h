@@ -1,8 +1,6 @@
 #ifndef CAMERAWIDGET_H
 #define CAMERAWIDGET_H
 
-#ifndef RASPBERRY
-
 #define RESOLUTION_WIDTH  640
 #define RESOLUTION_HEIGHT 480
 
@@ -17,6 +15,8 @@
 
 using namespace cv;
 using namespace std;
+
+#ifndef RASPBERRY
 
 class CameraWidget : public QGLWidget, protected QGLFunctions
 {

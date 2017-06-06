@@ -1,8 +1,16 @@
 #include "handdetection.h"
 
-HandDetection::HandDetection(): refSkin( new SkinFilter() ),
+#include <QDebug>
+
+HandDetection::HandDetection(QObject *parent) : QObject(parent), refSkin( new SkinFilter() ),
     fingers(0), count(0), sumatory(0), avgPx(0)
-{}
+{
+
+    estado_hayMano_o_no = false;  // Por defecto no hay mano
+    estado_manoAbierta_o_cerrada = true;  // Por defecto abierta
+
+
+}
 
 /**
   retorna true si encuentra puño cerrado, en cualquier otro caso retorna false
@@ -11,23 +19,33 @@ HandDetection::HandDetection(): refSkin( new SkinFilter() ),
 */
 bool HandDetection::fistDetection(Mat &frame, int minHue, int maxHue, bool alterFrame)
 {
-    if( !(processFrames(frame, minHue, maxHue)) ){
+    if( ! (processFrames(frame, minHue, maxHue)) ){
         QString text( "No hay mano en la escena:");
         if(alterFrame)
             putText( frame, text.toStdString(), Point( 10, 30 ), 1, 2, Scalar( 255, 0, 0 ) );
         return false;
     }
 
-    if(fingers <= 3){
-        QString text( "Mano cerrada detectada" );
-            if(alterFrame)
-        putText( frame, text.toStdString(), Point( 10, 30 ), 1, 2, Scalar( 255, 0, 0 ) );
+    if(fingers <= 2){
+        QString text( "Mano cerrada" );
+        if(alterFrame)
+            putText( frame, text.toStdString(), Point( 10, 30 ), 1, 2, Scalar( 255, 0, 0 ) );
+
+        if ( estado_manoAbierta_o_cerrada == true )  {
+            estado_manoAbierta_o_cerrada = false;
+            emit signal_estado_manoAbierta_o_cerrada( false );
+        }
 
         return true;
-    }else if (fingers >= 3 && fingers <= 5){
-        QString text( "Mano abierta detectada" );
-            if(alterFrame)
-        putText( frame, text.toStdString(), Point( 10, 30 ), 1, 2, Scalar( 255, 0, 0 ) );
+    }else if (fingers >= 3){
+        QString text( "Mano abierta" );
+        if(alterFrame)
+            putText( frame, text.toStdString(), Point( 10, 30 ), 1, 2, Scalar( 255, 0, 0 ) );
+
+        if ( estado_manoAbierta_o_cerrada == false )  {
+            estado_manoAbierta_o_cerrada = true;
+            emit signal_estado_manoAbierta_o_cerrada( true );
+        }
 
         return false;
     }
@@ -48,7 +66,7 @@ bool HandDetection::processFrames(Mat &frame, int minHue, int maxHue)
     cvtColor( frame, hsvFrame, CV_BGR2Lab );
 
     /// pregunto si existe una mano, sino dejo de analizar
-    if (!isHandInFrame(hsvFrame, minHue, maxHue)) {
+    if ( ! isHandInFrame(hsvFrame, minHue, maxHue))  {
         return false;
     }
 
@@ -175,12 +193,14 @@ void HandDetection::findConvexityDefects(Mat &frame, vector< vector< Point > > c
 
                     varianza = sqrt(sumatoria/defects.size());
 
+//                    qDebug() << "\ndefects" << defects.size();
+
                     for( unsigned int j = 0; j < defects.size(); j++ )
                     {
                         // the farthest from the convex hull point within the defect
                         float depth = defects[j][3] / 256;
 
-
+//                        if( depth > 70)
                         if( depth > promedio)
                         {
                             // Entra a este if cada vez que supere esta depth, deberia detectar 4 depth que superen
@@ -207,7 +227,32 @@ void HandDetection::findConvexityDefects(Mat &frame, vector< vector< Point > > c
                             ///jr: tengo que controlar que la distancia entre dos puntos
                             /// sea mayor (en principio) a una distancia arbitraria
 //                            qDebug() << "distance:" << distance(ptEnd, ptFar);
-                            if( distance(ptEnd, ptFar) < 9000) break; // con este valor a aprox 40 cm deja de detectar el dedo menique porque es muy corto
+//                            if( distance(ptEnd, ptFar) < 1000)
+//                                break; // con este valor a aprox 40 cm deja de detectar el dedo menique porque es muy corto
+
+
+//                            qDebug() << "distance:" << distance(ptStart, ptFar);
+//                            if( distance(ptStart, ptEnd) < 20)
+//                                break; // con este valor a aprox 40 cm deja de detectar el dedo menique porque es muy corto
+
+                            if( distanceSqrt( ptStart, ptEnd ) < 30 )  {
+                                continue;
+                            }
+
+                            if( distanceSqrt( ptStart, ptFar ) < 30 )  {
+                                continue;
+                            }
+
+                            if( distanceSqrt( ptEnd, ptFar ) < 30 )  {
+                                continue;
+                            }
+
+//                            qDebug() << "ptStart" << j << " - " << ptStart.x << ptStart.y;
+//                            qDebug() << "ptEnd" << j << " - " << ptEnd.x << ptEnd.y;
+//                            qDebug() << "ptFar" << j << " - " << ptFar.x << ptFar.y;
+//                            qDebug() << "distance ptStart, ptEnd:" << j << " - " << distanceSqrt(ptStart, ptEnd);
+//                            qDebug() << "distance ptEnd, ptFar:" << j << " - " << distanceSqrt(ptEnd, ptFar);
+//                            qDebug() << "distance ptStart, ptFar:" << j << " - " << distanceSqrt(ptStart, ptFar);
 
 
                             ///jr. le pongo esto para que no dibuje puntos debajo de 100px del centro de masa
@@ -225,15 +270,17 @@ void HandDetection::findConvexityDefects(Mat &frame, vector< vector< Point > > c
                             relevants.push_back( ptEnd );
 
                             fingers++;
+
+
                             ///jr. limito que solo detecte hasta 5 dedos
-                            if(fingers == 5){
-//                                qDebug() << "dedos" << fingers;
-                                break;
-                            }
+//                            if(fingers == 5){
+////                                qDebug() << "dedos" << fingers;
+//                                break;
+//                            }
                         }
                     }
                     ///jr. limito que solo detecte hasta 5 dedos
-                    if(fingers == 5) break;
+//                    if(fingers == 5) break;
                 }
             }
         }
@@ -404,7 +451,7 @@ double HandDetection::distance( Point a, Point b )
 // calculo distancia entre dos Points con raiz cuadrada
 double HandDetection::distanceSqrt( Point a, Point b )
 {
-    return sqrt((a.x - b.y)*(a.x - b.y ) + (a.x - b.y)*(a.x - b.y));
+    return sqrt( ( a.x - b.x ) * ( a.x - b.x ) + ( a.y - b.y ) * ( a.y - b.y ) );
 }
 
 
@@ -491,6 +538,24 @@ bool HandDetection::isHandInFrame(Mat &hsvFrame, int minHue, int maxHue)
     }
     //*/
 
-    if(sum >= 12000) return true; // existe mano
-    else return false; // no existe mano
+    if(sum >= 10000)  {
+//        qDebug() << "Siiiiiii existe mano" << sum;
+
+        if ( estado_hayMano_o_no == false )  {
+            estado_hayMano_o_no = true;
+            emit signal_cambioEstado_hayMano_o_no( true );
+        }
+
+        return true; // existe mano
+    }
+    else  {
+//        qDebug() << "Nooooooo existe mano" << sum;
+
+        if ( estado_hayMano_o_no == true )  {
+            estado_hayMano_o_no = false;
+            emit signal_cambioEstado_hayMano_o_no( false );
+        }
+
+        return false; // no existe mano
+    }
 }

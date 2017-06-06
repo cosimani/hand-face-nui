@@ -1,33 +1,36 @@
 QT += widgets sql
 
 # Si se define, entonces no usara multimedia ni opengl
-DEFINES += RASPBERRY
+#DEFINES += RASPBERRY
 
 ! defined(RASPBERRY)  {
-#    QT += multimedia opengl
+    QT += multimedia opengl
 #    unix:INCLUDEPATH += "/usr/include/GL/"
 }
 
-#DIR_OPENCV_LIBS = /usr/local/lib
-#DIR_OTHER_LIBS = /usr/lib/x86_64-linux-gnu
-DIR_OPENCV_LIBS = /home/pi/2017/opencv-3.2.0/compilado/lib/
-#DIR_OPENCV_LIBS = /usr/lib/arm-linux-gnueabihf
+defined(RASPBERRY)  {
 
-unix:INCLUDEPATH += /home/pi/2017/opencv-3.2.0/include/
-unix:INCLUDEPATH += /home/pi/2017/opencv-3.2.0/modules/core/include/
-unix:INCLUDEPATH += /home/pi/2017/opencv-3.2.0/modules/imgproc/include/
-unix:INCLUDEPATH += /home/pi/2017/opencv-3.2.0/modules/video/include/
-#unix:INCLUDEPATH += /home/pi/2017/opencv-3.2.0/modules/flann/include/
-#unix:INCLUDEPATH += /home/pi/2017/opencv-3.2.0/modules/features2d/include/
-#unix:INCLUDEPATH += /home/pi/2017/opencv-3.2.0/modules/calib3d/include/
-unix:INCLUDEPATH += /home/pi/2017/opencv-3.2.0/modules/objdetect/include/
-unix:INCLUDEPATH += /home/pi/2017/opencv-3.2.0/modules/highgui/include/
-#unix:INCLUDEPATH += /home/pi/2017/opencv-3.2.0/modules/photo/include/
-#unix:INCLUDEPATH += /home/pi/2017/opencv-3.2.0/modules/ml/include/
-#unix:INCLUDEPATH += /home/pi/2017/opencv-3.2.0/modules/contrib/include/
-#unix:INCLUDEPATH += /home/pi/2017/opencv-3.2.0/modules/hal/include/
-#unix:INCLUDEPATH += /home/pi/2017/opencv-3.2.0/modules/imgcodecs/include/
-unix:INCLUDEPATH += /home/pi/2017/opencv-3.2.0/modules/videoio/include/
+#    DIR_OPENCV_LIBS = /home/pi/2017/opencv-3.2.0/compilado/lib/
+#    #DIR_OPENCV_LIBS = /usr/lib/arm-linux-gnueabihf
+
+#    unix:INCLUDEPATH += /home/pi/2017/opencv-3.2.0/include/
+#    unix:INCLUDEPATH += /home/pi/2017/opencv-3.2.0/modules/core/include/
+#    unix:INCLUDEPATH += /home/pi/2017/opencv-3.2.0/modules/imgproc/include/
+#    unix:INCLUDEPATH += /home/pi/2017/opencv-3.2.0/modules/video/include/
+#    #unix:INCLUDEPATH += /home/pi/2017/opencv-3.2.0/modules/flann/include/
+#    #unix:INCLUDEPATH += /home/pi/2017/opencv-3.2.0/modules/features2d/include/
+#    #unix:INCLUDEPATH += /home/pi/2017/opencv-3.2.0/modules/calib3d/include/
+#    unix:INCLUDEPATH += /home/pi/2017/opencv-3.2.0/modules/objdetect/include/
+#    unix:INCLUDEPATH += /home/pi/2017/opencv-3.2.0/modules/highgui/include/
+#    #unix:INCLUDEPATH += /home/pi/2017/opencv-3.2.0/modules/photo/include/
+#    #unix:INCLUDEPATH += /home/pi/2017/opencv-3.2.0/modules/ml/include/
+#    #unix:INCLUDEPATH += /home/pi/2017/opencv-3.2.0/modules/contrib/include/
+#    #unix:INCLUDEPATH += /home/pi/2017/opencv-3.2.0/modules/hal/include/
+#    #unix:INCLUDEPATH += /home/pi/2017/opencv-3.2.0/modules/imgcodecs/include/
+#    unix:INCLUDEPATH += /home/pi/2017/opencv-3.2.0/modules/videoio/include/
+}
+
+DIR_OPENCV_LIBS = /usr/local/lib
 
 
 unix:LIBS += -L$$DIR_OPENCV_LIBS
